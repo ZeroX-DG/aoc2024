@@ -4,25 +4,26 @@ defmodule Day3 do
     |> List.to_string
     |> String.to_integer
     remaining = Enum.drop_while(characters, fn char -> char in ?0..?9 end)
+    |> List.to_string
 
     {number, remaining}
   end
 
   def parse(characters, enable, consider_do_dont) do
     case characters do
-      [?m, ?u, ?l, ?( | rest] when enable -> 
+      <<"mul(", rest::binary>> when enable -> 
         try do
           # parse a number
-          {a, remaining} = parse_number(rest)
+          {a, remaining} = parse_number(String.to_charlist(rest))
 
           # parse a comma
-          [?, | rest] = remaining
+          <<",", rest::binary>> = remaining
 
           # parse second number
-          {b, remaining} = parse_number(rest)
+          {b, remaining} = parse_number(String.to_charlist(rest))
 
           # parse a closing bracket
-          [?) | rest] = remaining
+          <<")", rest::binary>> = remaining
 
           parse(rest, enable, consider_do_dont) + a * b
         rescue
@@ -30,24 +31,24 @@ defmodule Day3 do
         end
 
       # do
-      [?d, ?o, ?(, ?) | rest] when consider_do_dont -> parse(rest, true, true)
+      <<"do()", rest::binary>> when consider_do_dont -> parse(rest, true, true)
 
       # don't
-      [?d, ?o, ?n, ?', ?t, ?(, ?) | rest] when consider_do_dont -> parse(rest, false, true)
+      <<"don't()", rest::binary>> when consider_do_dont -> parse(rest, false, true)
 
-      [_ | rest] -> parse(rest, enable, consider_do_dont)
+      <<_, rest::binary>> -> parse(rest, enable, consider_do_dont)
       _ -> 0
     end
   end
 
   def part1 do
     {:ok, contents} = File.read("input.txt")
-    IO.puts("part 1 result: #{parse(String.to_charlist(contents), true, false)}")
+    IO.puts("part 1 result: #{parse(contents, true, false)}")
   end
 
   def part2 do
     {:ok, contents} = File.read("input.txt")
-    IO.puts("part 2 result: #{parse(String.to_charlist(contents), true, true)}")
+    IO.puts("part 2 result: #{parse(contents, true, true)}")
   end
 end
 
