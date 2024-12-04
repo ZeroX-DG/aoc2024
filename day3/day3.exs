@@ -11,19 +11,19 @@ defmodule Day3 do
 
   def parse(characters, enable, consider_do_dont) do
     case characters do
-      <<"mul(", rest::binary>> when enable -> 
+      "mul(" <> rest when enable -> 
         try do
           # parse a number
           {a, remaining} = parse_number(String.to_charlist(rest))
 
           # parse a comma
-          <<",", rest::binary>> = remaining
+          "," <> rest = remaining
 
           # parse second number
           {b, remaining} = parse_number(String.to_charlist(rest))
 
           # parse a closing bracket
-          <<")", rest::binary>> = remaining
+          ")" <> rest = remaining
 
           parse(rest, enable, consider_do_dont) + a * b
         rescue
@@ -31,10 +31,10 @@ defmodule Day3 do
         end
 
       # do
-      <<"do()", rest::binary>> when consider_do_dont -> parse(rest, true, true)
+      "do()" <> rest when consider_do_dont -> parse(rest, true, true)
 
       # don't
-      <<"don't()", rest::binary>> when consider_do_dont -> parse(rest, false, true)
+      "don't()" <> rest when consider_do_dont -> parse(rest, false, true)
 
       <<_, rest::binary>> -> parse(rest, enable, consider_do_dont)
       _ -> 0
