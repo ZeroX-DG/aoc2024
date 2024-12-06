@@ -9,6 +9,62 @@ defmodule Grid do
     end)
   end
 
+  def contains(grid, chars) do
+    Enum.any?(grid, fn row ->
+      Enum.any?(row, fn col -> col in chars end)
+    end)
+  end
+
+  def cell(grid, row, col) do
+    Enum.at(grid, row) |> Enum.at(col)
+  end
+
+  def fill(grid, row, col, value) do
+    List.replace_at(grid, row, List.replace_at(Enum.at(grid, row), col, value))
+  end
+
+  def fill_up(grid, row, col, value, predicate) do
+    if row < 0 or !predicate.(Grid.cell(grid, row, col)) do
+      {grid, row + 1, col, row < 0}
+    else
+      Grid.fill(grid, row, col, value)
+      |> fill_up(row - 1, col, value, predicate)
+    end
+  end
+
+  def fill_down(grid, row, col, value, predicate) do
+    if row > length(grid) - 1 or !predicate.(Grid.cell(grid, row, col)) do
+      {grid, row - 1, col, row > length(grid) - 1}
+    else
+      Grid.fill(grid, row, col, value)
+      |> fill_down(row + 1, col, value, predicate)
+    end
+  end
+
+  def fill_right([head | _] = grid, row, col, value, predicate) do
+    if col > length(head) - 1 or !predicate.(Grid.cell(grid, row, col)) do
+      {grid, row, col - 1, col > length(head) - 1}
+    else
+      Grid.fill(grid, row, col, value)
+      |> fill_right(row, col + 1, value, predicate)
+    end
+  end
+
+  def fill_left(grid, row, col, value, predicate) do
+    if col < 0 or !predicate.(Grid.cell(grid, row, col)) do
+      {grid, row, col + 1, col < 0}
+    else
+      Grid.fill(grid, row, col, value)
+      |> fill_left(row, col - 1, value, predicate)
+    end
+  end
+
+  def count(grid, char) do
+    Enum.reduce(grid, 0, fn row, acc ->
+      acc + Enum.count(row, fn col -> col == char end)
+    end)
+  end
+
   def foreach(grid, chars, callback) do
     for {row, row_idx} <- Enum.with_index(grid),
         {cell, col_idx} <- Enum.with_index(row),
