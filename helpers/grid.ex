@@ -56,4 +56,30 @@ defmodule Grid do
         Enum.map(0..(len - 1), fn i -> Enum.at(grid, row_idx + i) |> Enum.at(col_idx - i) end)
     end
   end
+
+  def slice_xy_reverse_right_left(grid, row_idx, col_idx, len) do
+    cond do
+      row_idx - len + 1 < 0 ->
+        []
+
+      col_idx - len + 1 < 0 ->
+        []
+
+      true ->
+        Enum.map(0..(len - 1), fn i -> Enum.at(grid, row_idx - i) |> Enum.at(col_idx - i) end)
+    end
+  end
+
+  def slice_xy_reverse_left_right(grid, row_idx, col_idx, len) do
+    cond do
+      row_idx - len + 1 < 0 ->
+        []
+
+      col_idx + len > length(Enum.at(grid, row_idx)) ->
+        []
+
+      true ->
+        Enum.map(0..(len - 1), fn i -> Enum.at(grid, row_idx - i) |> Enum.at(col_idx + i) end)
+    end
+  end
 end
