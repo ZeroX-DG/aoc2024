@@ -15,6 +15,17 @@ defmodule Grid do
     end)
   end
 
+  def find(grid, value) do
+    grid
+    |> Enum.with_index()
+    |> Enum.reduce_while(nil, fn {row, row_idx}, _acc ->
+      case Enum.with_index(row) |> Enum.find(fn {v, _} -> v == value end) do
+        {_, col_idx} -> {:halt, {row_idx, col_idx}}
+        nil -> {:cont, nil}
+      end
+    end)
+  end
+
   def cell(grid, row, col) do
     Enum.at(grid, row) |> Enum.at(col)
   end
